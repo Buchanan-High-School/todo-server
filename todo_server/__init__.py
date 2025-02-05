@@ -22,7 +22,7 @@ class RequestFormatter(logging.Formatter):
 
 
 def create_app(config=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path="/static")
     app.config.from_object(config)
     if not app.debug and not app.testing:
         if not os.path.exists("log"):

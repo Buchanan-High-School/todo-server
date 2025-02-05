@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, current_app, g, jsonify, request
+from flask import abort, Blueprint, current_app, g, jsonify, render_template, request
 from webargs import fields
 from webargs.flaskparser import parser
 
@@ -28,7 +28,7 @@ def load_data(request, schema):
 
 @bp.get("/")
 def index():
-    return f"Welcome {g.current_user}"
+    return render_template("index.html")
 
 
 @bp.get("/todo")
