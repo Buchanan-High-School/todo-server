@@ -17,7 +17,7 @@ def check_query_param():
     if not args.get("user"):
         abort(401, "Missing requried `user` parameter")
     else:
-        g.current_user = args.get("user")
+        g.current_user = int(args.get("user"))
 
 
 # Set webargs to look at the `data` property of the request object
@@ -43,7 +43,15 @@ def get_all_todo():
 
 @bp.get("/todo/<int:todo_id>")
 def get_single_todo(todo_id):
-    pass
+    todo = Todo.query.filter(Todo.id == todo_id).first()
+
+    if not todo:
+        abort(404, "No todo found with that id")
+
+    if todo.user_id != g.current_user:
+        abort(403, "You are not authorized to access this item.")
+
+    return TodoSchema().dump(todo)
 
 
 @bp.post("/todo")
@@ -67,15 +75,54 @@ def create_todo():
     db.session.add(todo)
     db.session.commit()
 
-    todos = Todo.query.filter(Todo.user_id == args.get("user_id")).all()
+    todos = Todo.query.filter(Todo.user_id == g.current_user).all()
     return TodoSchema(many=True).dump(todos)
 
 
 @bp.put("/todo/<int:todo_id>")
 def edit_todo(todo_id):
-    pass
+    todo = Todo.query.filter(Todo.id == todo_id).first()
+
+    if not todo:
+        abort(404, "There is no item with that ID.")
+
+    if todo.user_id != g.current_user:
+        abort(403, "You are not authorized to access this item.")
+
+    args = parser.parse(
+        {
+            "title": fields.Str(required=True),
+            "description": fields.Str(),
+            "due": fields.DateTime(),
+        },
+        location="data",
+    )
+
+    if args:
+        todo.update(args)
+
+    return TodoSchema().dump(todo)
 
 
 @bp.delete("/todo/<int:todo_id>")
 def delete_todo(todo_id):
-    pass
+    todo = Todo.query.filter(Todo.id == todo_id).first()
+
+    if not todo:
+        abort(404, "There is no item with that ID.")
+
+    if todo.user_id != g.current_user:
+        abort(403, "You are not authorized to access this item.")
+
+    db.session.delete(todo)
+    db.session.commit()
+
+    # return the new array of items
+    todos = Todo.query.filter(Todo.user_id == g.current_user).all()
+
+    return jsonify(
+        {
+            "msg": "Operation completed successfully",
+            "data": TodoSchema(many=True).dump(todos),
+        }
+    )

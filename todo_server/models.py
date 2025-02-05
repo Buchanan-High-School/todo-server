@@ -63,6 +63,15 @@ class Todo(db.Model):
     due = db.Column(db.Date, nullable=False, default=default_due)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer)
+    completed = db.Column(db.Boolean, default=False)
+
+    def update(self, data):
+        for key, value in data.items():
+            if key == "courses":
+                continue
+            else:
+                setattr(self, key, value)
+        db.session.commit()
 
 
 class User(UserMixin, db.Model):
