@@ -49,6 +49,8 @@ marshmallow==3.26.1
     # via webargs
 marshmallow-sqlalchemy==1.4.0
     # via todo-server
+nh3==0.2.20
+    # via todo-server
 packaging==24.2
     # via gunicorn
     # via marshmallow
