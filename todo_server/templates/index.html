@@ -42,8 +42,8 @@
 			<h2 id="calling">Calling the API</h2>
 			<h3 id="authentication">Authentication</h3>
 			<p>Each request needs a
-				<code>user=######</code> query parameter to autneticate the request. Missing this parameter will
-				result in a 403 error.
+				<code>user=######</code> query parameter to authenticate the request. Missing this parameter will
+				result in a <code>401 Unauthorized</code> error.
 			</p>
 			<pre>https://todo-server.local/?user=000000</pre>
 			<p>Your value for the <code>user</code> parameter should be your <strong>school id.</strong> We will add
@@ -77,6 +77,7 @@ let options = {
 			<section class="endpoint">
 				<h3 id="get-todos">Get all todos</h3>
 				<p><code>GET http://todo-server.local/todo?user=000000</code> List all todos for a user.</p>
+				<p>This will return an array of all todo items for the requested user.
 				<pre>
 {
 	data: [
@@ -103,15 +104,15 @@ let options = {
 			<section class="endpoint">
 				<h3 id="post-todo">Create a todo</h3>
 				<p><code>POST http://todo-server.local/todo?user=000000</code> create a todo item for a given user.</p>
-				<h5>Required parameters</h5>
+				<h4>Required parameters</h4>
 				<ul>
-					<li><code>title</code>: heading for the item</li>
+					<li><code>&lt;string&gt; title</code>: heading for the item</li>
 				</ul>
-				<h5>Optional parameters</h5>
+				<h4>Optional parameters</h4>
 				<ul>
 					<li><code>&lt;string&gt; description</code>: details about the todo item</li>
 					<li><code>&lt;Date&gt; due</code>: due date for the given item. If omitted, the due date will automatically be set to one day in the future from the time of creation.</li>
-					<li><code>&ltBoolean&gt; completed</code>: whether or note the item is completed.</li>
+					<li><code>&ltBoolean&gt; completed</code>: whether or not the item is completed.</li>
 				</ul>
 				<p>Send a request</p>
 				<pre>
@@ -169,7 +170,14 @@ fetch("http://todo-server.local/todo?user=000000", options)
 			<section class="endpoint">
 				<h3 id="put-todo">Update a todo</h3>
 				<p><code>PUT http://todo-server.local/todo/1?user=000000</code> update a single todo item</p>
-				<p>Valid fields sent in the request will be updated on the todo object.</p>
+				<p>Valid fields sent in the request will be updated on the todo object. Empty requests will return a <code>400 Bad Request</code> error.</p>
+				<h4>Optional parameters</h4>
+				<ul>
+					<li><code>&lt;string&gt; title</code>: heading for the item</li>
+					<li><code>&lt;string&gt; description</code>: details about the todo item</li>
+					<li><code>&lt;Date&gt; due</code>: due date for the given item. If omitted, the due date will automatically be set to one day in the future from the time of creation.</li>
+					<li><code>&ltBoolean&gt; completed</code>: whether or not the item is completed.</li>
+				</ul>
 			<pre>
 
 let options = {

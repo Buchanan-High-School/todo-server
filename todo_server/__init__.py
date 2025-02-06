@@ -2,7 +2,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, has_request_context, request
+from flask import Flask, has_request_context, request, render_template
 from todo_server.exceptions import (
     bad_request,
     not_authorized,
@@ -58,13 +58,17 @@ def create_app(config=Config):
 
     # register error handlers
     app.register_error_handler(400, bad_request)
-    app.register_error_handler(404, not_found)
     app.register_error_handler(403, not_authorized)
-    app.register_error_handler(422, unprocessable_entity)
+    app.register_error_handler(404, not_found)
     app.register_error_handler(415, unsupported_media_type)
+    app.register_error_handler(422, unprocessable_entity)
     app.register_error_handler(500, server_error)
 
     # register the routes
     app.register_blueprint(todo.bp)
+
+    @app.get("/")
+    def index():
+        return render_template("index.html"), 200
 
     return app
