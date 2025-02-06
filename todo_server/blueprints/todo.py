@@ -1,11 +1,11 @@
-from flask import abort, Blueprint, g, jsonify, render_template
+from flask import abort, Blueprint, g, jsonify
 from webargs import fields
 from webargs.flaskparser import parser
 
 from todo_server.extensions import db
 from todo_server.models import Todo
 from todo_server.schemas import TodoSchema
-
+from todo_server.utils import clean_escaped_html
 
 bp = Blueprint("todo", __name__)
 
@@ -15,7 +15,7 @@ bp = Blueprint("todo", __name__)
 def check_query_param():
     args = parser.parse({"user": fields.Str()}, location="query")
     if not args.get("user"):
-        abort(401, "Missing requried `user` parameter")
+        abort(401, "Missing required `user` parameter")
     else:
         g.current_user = int(args.get("user"))
 
@@ -24,11 +24,6 @@ def check_query_param():
 @parser.location_loader("data")
 def load_data(request, schema):
     return request.json
-
-
-@bp.get("/")
-def index():
-    return render_template("index.html"), 200
 
 
 @bp.get("/todo")
@@ -76,9 +71,15 @@ def create_todo():
     )
     args["user_id"] = g.current_user
 
+    # Sanitize the string inputs.
+    title = clean_escaped_html(args.get("title"))
+
+    if args.get("description"):
+        description = clean_escaped_html(args.get("description"))
+
     todo = Todo(
-        title=args.get("title"),
-        description=args.get("description"),
+        title=title,
+        description=description,
         due=args.get("due"),
         user_id=g.current_user,
     )
@@ -105,15 +106,26 @@ def edit_todo(todo_id):
 
     args = parser.parse(
         {
-            "title": fields.Str(required=True),
+            "title": fields.Str(),
             "description": fields.Str(),
             "due": fields.DateTime(),
+            "completed": fields.Bool()
         },
         location="data",
     )
 
+    if not args:
+        abort(400, "Empty JSON body.")
+
     if args:
+        if args.get("title"):
+            args["title"] = clean_escaped_html(args.get("title"))
+
+        if args.get("description"):
+            args["description"] = clean_escaped_html(args.get("description"))
+
         todo.update(args)
+
     return jsonify(
         {
             "data": TodoSchema().dump(todo),

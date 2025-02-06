@@ -48,9 +48,14 @@ def unsupported_media_type(e):
 
 
 def bad_request(e):
+    if e.description:
+        message = e.description
+    else:
+        message = "Failed to decode JSON object. Did you stringify?"
+
     return jsonify(
         {
-            "message": "Failed to decode JSON object. Did you forget to use JSON.stringify()?",
+            "message": message,
             "status": "error"
         }
     ), 400
