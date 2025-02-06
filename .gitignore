@@ -9,6 +9,9 @@ wheels/
 # venv
 .venv
 
+# editor variables
+.helix
+
 # environment keys
 .env
 

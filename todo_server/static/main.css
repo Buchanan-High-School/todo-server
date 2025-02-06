@@ -1,0 +1,42 @@
+/* Override pico.css styles */
+code {
+	background-color: whitesmoke;
+	color: #ff3860;
+	font-size: 0.8em;
+	font-weight: normal;
+	padding: 0.25em 0.5em 0.25em;
+}
+
+pre {
+	background: #f4f4f4;
+	border: 1px solid #ddd;
+	border-left: 3px solid #f36d33;
+	color: #666;
+	page-break-inside: avoid;
+	font-family: monospace;
+	font-size: 15px;
+	line-height: 1.6;
+	margin-bottom: 1.6em;
+	max-width: 100%;
+	overflow: auto;
+	padding: 1em 1.5em;
+	display: block;
+	word-wrap: break-word;
+}
+
+main {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 80vw;
+	margin: 0 auto;
+	gap: 2rem;
+}
+
+.sidebar {
+	flex-basis: 20ch;
+}
+
+.not-sidebar {
+	flex: 1 1 0;
+}

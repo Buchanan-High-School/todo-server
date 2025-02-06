@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, current_app, g, jsonify, render_template, request
+from flask import abort, Blueprint, g, jsonify, render_template
 from webargs import fields
 from webargs.flaskparser import parser
 
@@ -28,7 +28,7 @@ def load_data(request, schema):
 
 @bp.get("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html"), 200
 
 
 @bp.get("/todo")
@@ -38,7 +38,12 @@ def get_all_todo():
     """
     current_user = g.current_user
     user_todo = Todo.query.filter(Todo.user_id == current_user).all()
-    return TodoSchema(many=True).dump(user_todo)
+    return jsonify(
+        {
+            "data": TodoSchema(many=True).dump(user_todo),
+            "status": "success"
+        }
+    ), 200
 
 
 @bp.get("/todo/<int:todo_id>")
@@ -46,12 +51,17 @@ def get_single_todo(todo_id):
     todo = Todo.query.filter(Todo.id == todo_id).first()
 
     if not todo:
-        abort(404, "No todo found with that id")
+        abort(404)
 
     if todo.user_id != g.current_user:
         abort(403, "You are not authorized to access this item.")
 
-    return TodoSchema().dump(todo)
+    return jsonify(
+        {
+            "data": TodoSchema().dump(todo),
+            "status": "success"
+        }
+    ), 200
 
 
 @bp.post("/todo")
@@ -76,7 +86,11 @@ def create_todo():
     db.session.commit()
 
     todos = Todo.query.filter(Todo.user_id == g.current_user).all()
-    return TodoSchema(many=True).dump(todos)
+    return jsonify({
+        "created": TodoSchema().dump(todo),
+        "data": TodoSchema(many=True).dump(todos),
+        "status": "success"
+    }), 200
 
 
 @bp.put("/todo/<int:todo_id>")
@@ -100,8 +114,12 @@ def edit_todo(todo_id):
 
     if args:
         todo.update(args)
-
-    return TodoSchema().dump(todo)
+    return jsonify(
+        {
+            "data": TodoSchema().dump(todo),
+            "status": "success"
+        }
+    ), 200
 
 
 @bp.delete("/todo/<int:todo_id>")
@@ -122,7 +140,7 @@ def delete_todo(todo_id):
 
     return jsonify(
         {
-            "msg": "Operation completed successfully",
             "data": TodoSchema(many=True).dump(todos),
+            "status": "success"
         }
-    )
+    ), 200

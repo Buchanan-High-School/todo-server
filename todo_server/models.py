@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import timedelta, date
 
 from flask_login import UserMixin
 from sqlalchemy.orm import backref
@@ -11,7 +11,7 @@ from todo_server.extensions import db, login_manager
 
 
 def default_due():
-    valid = datetime.date.today() + datetime.timedelta(days=1)
+    valid = date.today() + timedelta(days=1)
     return valid
 
 

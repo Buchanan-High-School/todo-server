@@ -3,6 +3,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, has_request_context, request
+from todo_server.exceptions import (
+    bad_request,
+    not_authorized,
+    not_found,
+    server_error,
+    unprocessable_entity,
+    unsupported_media_type
+)
 from todo_server.extensions import db, login_manager, ma, migrate
 from todo_server.blueprints import todo
 
@@ -43,13 +51,20 @@ def create_app(config=Config):
         app.logger.setLevel(logging.INFO)
         app.logger.info("Starting todo_server")
 
-    from todo_server import models
-
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
 
+    # register error handlers
+    app.register_error_handler(400, bad_request)
+    app.register_error_handler(404, not_found)
+    app.register_error_handler(403, not_authorized)
+    app.register_error_handler(422, unprocessable_entity)
+    app.register_error_handler(415, unsupported_media_type)
+    app.register_error_handler(500, server_error)
+
+    # register the routes
     app.register_blueprint(todo.bp)
 
     return app
