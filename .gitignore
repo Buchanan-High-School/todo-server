@@ -14,6 +14,7 @@ wheels/
 
 # environment keys
 .env
+gunicorn.config.py
 
 # app logs
 log/

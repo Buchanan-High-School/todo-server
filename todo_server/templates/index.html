@@ -36,7 +36,7 @@
 		<h1 id="todo-server">todo-server</h1>
 		<p>This is a small todo server to learn how to write JS applications against an API.</p>
 		<p>This server allows you to create, read, update, and delete "todo" items. Using your school ID, you'll be able
-			to create your own website to interact with the API, giving you a tool to help you stay on top of your work.
+			to create your own website to interact with the API, giving you a tool to help you stay on top of things...to do.
 		</p>
 		<section>
 			<h2 id="calling">Calling the API</h2>
@@ -55,6 +55,7 @@ let options = {
 				<pre>
 let options = {
 	headers: {
+		// authorization header
 		"Content-Type": "application/json"
 	}
 }
@@ -77,7 +78,7 @@ let options = {
 			<h2 id="endpoints">Endpoints</h2>
 			<section class="endpoint">
 				<h3 id="get-todos">Get all todos</h3>
-				<p><code>GET http://todo-server.local/todo?user=000000</code> List all todos for a user.</p>
+				<p><code>GET http://todo-server.local/todo</code> List all todos for a user.</p>
 				<p>This will return an array of all todo items for the requested user.
 				<pre>
 {
@@ -104,7 +105,7 @@ let options = {
 			</section>
 			<section class="endpoint">
 				<h3 id="post-todo">Create a todo</h3>
-				<p><code>POST http://todo-server.local/todo?user=000000</code> create a todo item for a given user.</p>
+				<p><code>POST http://todo-server.local/todo</code> create a todo item for a given user.</p>
 				<h4>Required parameters</h4>
 				<ul>
 					<li><code>&lt;string&gt; title</code>: heading for the item</li>
@@ -119,6 +120,7 @@ let options = {
 				<pre>
 let options = {
 	headers: {
+		"Authorization": "Basic bbennett:0000",
 		"Content-Type": "application/json"
 	},
 	method: "POST",
@@ -130,7 +132,7 @@ let options = {
 	}
 }
 
-fetch("http://todo-server.local/todo?user=000000", options)
+fetch("http://todo-server.local/todo", options)
 </pre>
 <p>Returns</p>
 <pre>
@@ -153,7 +155,7 @@ fetch("http://todo-server.local/todo?user=000000", options)
 			</section>
 			<section class="endpoint">
 			<h3 id="get-todo">Get a single todo</h3>
-				<p><code>GET http://todo-server.local/todo/1?user=000000</code> Get single todo for a user.</p>
+				<p><code>GET http://todo-server.local/todo/1</code> Get single todo for a user.</p>
 				<pre>
 {
 	data: {
@@ -170,7 +172,7 @@ fetch("http://todo-server.local/todo?user=000000", options)
 			</section>
 			<section class="endpoint">
 				<h3 id="put-todo">Update a todo</h3>
-				<p><code>PUT http://todo-server.local/todo/1?user=000000</code> update a single todo item</p>
+				<p><code>PUT http://todo-server.local/todo/1</code> update a single todo item</p>
 				<p>Valid fields sent in the request will be updated on the todo object. Empty requests will return a <code>400 Bad Request</code> error.</p>
 				<h4>Optional parameters</h4>
 				<ul>
@@ -182,13 +184,14 @@ fetch("http://todo-server.local/todo?user=000000", options)
 			<pre>
 
 let options = {
+	headers: { // request headers },
 	method: "PUT",
 	body: {
 		"title": "My new title"
 	}
 }
 
-fetch("http://todo-server.local/todo/1?user=000000", options)
+fetch("http://todo-server.local/todo/1", options)
 
 {
 	created: {
@@ -208,13 +211,14 @@ fetch("http://todo-server.local/todo/1?user=000000", options)
 			</section>	
 			<section class="endpoint">
 				<h3 id="delete-todo">Delete a todo</h3>
-				<p><code>DELETE http://todo-server.local/todo/1?user=000000</code> delete a todo for a user</p>
+				<p><code>DELETE http://todo-server.local/todo/1</code> delete a todo for a user</p>
 				<pre>
 let options = {
+	headers: { // request headers },
 	method: "DELETE"
 }
 
-fetch("http://todo-server.local/todo/1?user=000000", options)
+fetch("http://todo-server.local/todo/1", options)
 
 {
 	data: [
