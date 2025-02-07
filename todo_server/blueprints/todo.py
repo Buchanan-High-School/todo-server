@@ -13,11 +13,11 @@ bp = Blueprint("todo", __name__)
 # Catch any requests without the correct query param
 @bp.before_request
 def check_query_param():
-    args = parser.parse({"user": fields.Str()}, location="query")
-    if not args.get("user"):
-        abort(401, "Missing required `user` parameter")
+    args = parser.parse({"Authorization": fields.Str()}, location="headers")
+    if not args.get("Authorization"):
+        abort(401, "Missing required Authorization header")
     else:
-        g.current_user = int(args.get("user"))
+        g.current_user = str(args.get("Authorization").split(" ")[1])
 
 
 # Set webargs to look at the `data` property of the request object
@@ -33,12 +33,10 @@ def get_all_todo():
     """
     current_user = g.current_user
     user_todo = Todo.query.filter(Todo.user_id == current_user).all()
-    return jsonify(
-        {
-            "data": TodoSchema(many=True).dump(user_todo),
-            "status": "success"
-        }
-    ), 200
+    return (
+        jsonify({"data": TodoSchema(many=True).dump(user_todo), "status": "success"}),
+        200,
+    )
 
 
 @bp.get("/todo/<int:todo_id>")
@@ -51,12 +49,7 @@ def get_single_todo(todo_id):
     if todo.user_id != g.current_user:
         abort(403, "You are not authorized to access this item.")
 
-    return jsonify(
-        {
-            "data": TodoSchema().dump(todo),
-            "status": "success"
-        }
-    ), 200
+    return jsonify({"data": TodoSchema().dump(todo), "status": "success"}), 200
 
 
 @bp.post("/todo")
@@ -65,11 +58,12 @@ def create_todo():
         {
             "title": fields.Str(required=True),
             "description": fields.Str(),
-            "due": fields.DateTime(),
+            "due": fields.Date(),
+            "completed": fields.Bool(),
         },
         location="data",
     )
-    args["user_id"] = g.current_user
+    print(args)
 
     # Sanitize the string inputs.
     title = clean_escaped_html(args.get("title"))
@@ -77,21 +71,27 @@ def create_todo():
     if args.get("description"):
         description = clean_escaped_html(args.get("description"))
 
-    todo = Todo(
-        title=title,
-        description=description,
-        due=args.get("due"),
-        user_id=g.current_user,
-    )
+    todo = Todo(user_id=g.current_user, **args)
+    # todo = Todo(
+    #     title=title,
+    #     description=description,
+    #     due=args.get("due"),
+    #     user_id=g.current_user,
+    # )
     db.session.add(todo)
     db.session.commit()
 
     todos = Todo.query.filter(Todo.user_id == g.current_user).all()
-    return jsonify({
-        "created": TodoSchema().dump(todo),
-        "data": TodoSchema(many=True).dump(todos),
-        "status": "success"
-    }), 200
+    return (
+        jsonify(
+            {
+                "created": TodoSchema().dump(todo),
+                "data": TodoSchema(many=True).dump(todos),
+                "status": "success",
+            }
+        ),
+        200,
+    )
 
 
 @bp.put("/todo/<int:todo_id>")
@@ -109,7 +109,7 @@ def edit_todo(todo_id):
             "title": fields.Str(),
             "description": fields.Str(),
             "due": fields.DateTime(),
-            "completed": fields.Bool()
+            "completed": fields.Bool(),
         },
         location="data",
     )
@@ -126,12 +126,7 @@ def edit_todo(todo_id):
 
         todo.update(args)
 
-    return jsonify(
-        {
-            "data": TodoSchema().dump(todo),
-            "status": "success"
-        }
-    ), 200
+    return jsonify({"data": TodoSchema().dump(todo), "status": "success"}), 200
 
 
 @bp.delete("/todo/<int:todo_id>")
@@ -150,9 +145,7 @@ def delete_todo(todo_id):
     # return the new array of items
     todos = Todo.query.filter(Todo.user_id == g.current_user).all()
 
-    return jsonify(
-        {
-            "data": TodoSchema(many=True).dump(todos),
-            "status": "success"
-        }
-    ), 200
+    return (
+        jsonify({"data": TodoSchema(many=True).dump(todos), "status": "success"}),
+        200,
+    )

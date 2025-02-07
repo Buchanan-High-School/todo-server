@@ -17,7 +17,6 @@ dependencies = [
     "flask-login>=0.6.3",
     "flask-marshmallow>=1.3.0",
     "marshmallow-sqlalchemy>=1.4.0",
-    "psycopg2>=2.9.10",
     "nh3>=0.2.20",
 ]
 readme = "README.md"

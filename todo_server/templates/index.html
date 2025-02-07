@@ -41,14 +41,15 @@
 		<section>
 			<h2 id="calling">Calling the API</h2>
 			<h3 id="authentication">Authentication</h3>
-			<p>Each request needs a
-				<code>user=######</code> query parameter to authenticate the request. Missing this parameter will
-				result in a <code>401 Unauthorized</code> error.
-			</p>
-			<pre>https://todo-server.local/?user=000000</pre>
-			<p>Your value for the <code>user</code> parameter should be your <strong>school id.</strong> We will add
-				additional authentication techniques later.
-			<h3>Request Headers</h3>
+			<p>Each request needs an <code>Authorization</code> header. Your authorization right now is formatted with <code>lastname:school_id</code>. If the header is missing, the endpoint will return a <code>401 Unauthorized</code> error.
+			<pre>
+let options = {
+	headers: {
+		"Authorization": "Basic bbennett:000000"
+	}
+}
+</pre>
+			<h3>Other Request Headers</h3>
 			<p><code>todo-server</code> expects JSON and will return JSON. Set a header to ensure the proper format is
 				returned.
 				<pre>

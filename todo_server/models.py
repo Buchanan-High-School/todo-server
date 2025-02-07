@@ -62,7 +62,7 @@ class Todo(db.Model):
     description = db.Column(db.String)
     due = db.Column(db.Date, nullable=False, default=default_due)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.String)
     completed = db.Column(db.Boolean, default=False)
 
     def update(self, data):
@@ -79,3 +79,4 @@ class User(UserMixin, db.Model):
     user_id = db.Column(db.Integer, unique=True)
     email = db.Column(db.String(32), unique=True)
     devices = db.relationship("Device", back_populates="user")
+    api_id = db.Column(db.String)
