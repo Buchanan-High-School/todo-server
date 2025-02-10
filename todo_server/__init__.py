@@ -67,6 +67,18 @@ def create_app(config=Config):
     # register the routes
     app.register_blueprint(todo.bp)
 
+    @app.before_request
+    def preflight():
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Content-Type", "application/json")
+        response.headers.add(
+            "Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+        )
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type, Authorization"
+        )
+        return Response(), 200
+
     @app.after_request
     def add_cors_headers(response):
         response.headers.add("Access-Control-Allow-Origin", "*")
