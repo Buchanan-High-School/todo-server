@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, g, jsonify, request, response
+from flask import abort, Blueprint, g, jsonify, request 
 from webargs import fields
 from webargs.flaskparser import parser
 
@@ -14,9 +14,6 @@ bp = Blueprint("todo", __name__)
 @bp.before_request
 def check_query_param():
     args = parser.parse({"Authorization": fields.Str()}, location="headers")
-    if request.method.lower == "options":
-        return Response()
-
     if not args.get("Authorization"):
         abort(401, "Missing required Authorization header")
     else:
