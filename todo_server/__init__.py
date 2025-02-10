@@ -71,7 +71,8 @@ def create_app(config=Config):
     def add_cors_headers(response):
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add("Content-Type", "application/json")
-        return response, 200
+        breakpoint()
+        return response
 
     @app.get("/")
     def index():
