@@ -69,15 +69,13 @@ def create_app(config=Config):
 
     @app.before_request
     def preflight():
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Content-Type", "application/json")
-        response.headers.add(
-            "Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS"
-        )
-        response.headers.add(
-            "Access-Control-Allow-Headers", "Content-Type, Authorization"
-        )
-        return Response(), 200
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+        if request.method.lower() == "options":
+            return jsonify(headers), 200
 
     @app.after_request
     def add_cors_headers(response):
