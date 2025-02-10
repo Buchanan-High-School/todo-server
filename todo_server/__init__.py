@@ -9,7 +9,7 @@ from todo_server.exceptions import (
     not_found,
     server_error,
     unprocessable_entity,
-    unsupported_media_type
+    unsupported_media_type,
 )
 from todo_server.extensions import db, login_manager, ma, migrate
 from todo_server.blueprints import todo
@@ -66,6 +66,11 @@ def create_app(config=Config):
 
     # register the routes
     app.register_blueprint(todo.bp)
+
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
 
     @app.get("/")
     def index():
