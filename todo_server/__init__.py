@@ -80,7 +80,6 @@ def create_app(config=Config):
     @app.after_request
     def add_cors_headers(response):
         response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Content-Type", "application/json")
         response.headers.add(
             "Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS"
         )
