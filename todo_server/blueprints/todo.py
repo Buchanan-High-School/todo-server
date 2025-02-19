@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, g, jsonify, request 
+from flask import abort, Blueprint, g, jsonify, request
 from webargs import fields
 from webargs.flaskparser import parser
 
@@ -126,7 +126,19 @@ def edit_todo(todo_id):
 
         todo.update(args)
 
-    return jsonify({"data": TodoSchema().dump(todo), "status": "success"}), 200
+    # return the entire list again
+    todos = Todo.query.filter(Todo.user_id == g.current_user).all()
+
+    return (
+        jsonify(
+            {
+                "created": TodoSchema().dump(todo),
+                "data": TodoSchema(many=True).dump(todos),
+                "status": "success",
+            }
+        ),
+        200,
+    )
 
 
 @bp.delete("/todo/<int:todo_id>")
