@@ -1,3 +1,5 @@
+from datetime import date
+
 from flask import abort, Blueprint, g, jsonify, request
 from webargs import fields
 from webargs.flaskparser import parser
@@ -10,6 +12,12 @@ from todo_server.utils import clean_escaped_html
 bp = Blueprint("todo", __name__)
 
 
+# Handle missing due dates on the request object
+def default_due():
+    valid = date.today() + timedelta(days=1)
+    return valid
+
+
 # Catch any requests without the correct query param
 @bp.before_request
 def check_query_param():
@@ -18,12 +26,6 @@ def check_query_param():
         abort(401, "Missing required Authorization header")
     else:
         g.current_user = str(args.get("Authorization").split(" ")[1])
-
-
-# Set webargs to look at the `data` property of the request object
-@parser.location_loader("data")
-def load_data(request, schema):
-    return request.json
 
 
 @bp.get("/todo")
@@ -54,16 +56,13 @@ def get_single_todo(todo_id):
 
 @bp.post("/todo")
 def create_todo():
-    args = parser.parse(
-        {
-            "title": fields.Str(required=True),
-            "description": fields.Str(),
-            "due": fields.Date(),
-            "completed": fields.Bool(),
-        },
-        location="data",
-    )
-    print(args)
+    args = request.json
+
+    if not args.get("title"):
+        abort(422, "Missing required 'title' argument.")
+
+    if not args.get("due"):
+        args["due"] = default_due()
 
     # Sanitize the string inputs.
     title = clean_escaped_html(args.get("title"))
@@ -72,12 +71,6 @@ def create_todo():
         description = clean_escaped_html(args.get("description"))
 
     todo = Todo(user_id=g.current_user, **args)
-    # todo = Todo(
-    #     title=title,
-    #     description=description,
-    #     due=args.get("due"),
-    #     user_id=g.current_user,
-    # )
     db.session.add(todo)
     db.session.commit()
 
@@ -97,26 +90,18 @@ def create_todo():
 @bp.put("/todo/<int:todo_id>")
 def edit_todo(todo_id):
     todo = Todo.query.filter(Todo.id == todo_id).first()
-
     if not todo:
         abort(404, "There is no item with that ID.")
 
     if todo.user_id != g.current_user:
         abort(403, "You are not authorized to access this item.")
 
-    args = parser.parse(
-        {
-            "title": fields.Str(),
-            "description": fields.Str(),
-            "due": fields.DateTime(),
-            "completed": fields.Bool(),
-        },
-        location="data",
-    )
+    args = request.json
 
     if not args:
         abort(400, "Empty JSON body.")
 
+    # Sanitize the string inputs.
     if args:
         if args.get("title"):
             args["title"] = clean_escaped_html(args.get("title"))
@@ -132,7 +117,7 @@ def edit_todo(todo_id):
     return (
         jsonify(
             {
-                "created": TodoSchema().dump(todo),
+                "updated": TodoSchema().dump(todo),
                 "data": TodoSchema(many=True).dump(todos),
                 "status": "success",
             }
