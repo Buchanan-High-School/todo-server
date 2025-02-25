@@ -122,7 +122,7 @@ def edit_todo(todo_id):
                 "status": "success",
             }
         ),
-        204,
+        200,
     )
 
 
