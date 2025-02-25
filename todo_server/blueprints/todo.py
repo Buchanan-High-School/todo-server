@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from flask import abort, Blueprint, g, jsonify, request
 from webargs import fields
@@ -122,7 +122,7 @@ def edit_todo(todo_id):
                 "status": "success",
             }
         ),
-        200,
+        204,
     )
 
 
