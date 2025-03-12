@@ -12,6 +12,5 @@ for env_file in ".env":
 
 from todo_server import create_app
 
-if __name__ == "__main__":
-    app = create_app(Config)
-    sio.run(app)
+app = create_app(Config)
+sio.run(app, cors_allowed_origins="*")
