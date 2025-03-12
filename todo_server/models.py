@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 from datetime import timedelta, date
 
 from flask_login import UserMixin
@@ -18,6 +19,14 @@ def default_due():
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+
+thread_replies = db.Table(
+    "thread_replies",
+    db.metadata,
+    db.Column("original_id", db.Integer, db.ForeignKey("thread.id"), primary_key=True),
+    db.Column("reply_id", db.Integer, db.ForeignKey("thread.id"), primary_key=True),
+)
 
 
 class Device(db.Model):
@@ -80,3 +89,40 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(32), unique=True)
     devices = db.relationship("Device", back_populates="user")
     api_id = db.Column(db.String)
+
+
+@dataclass
+class Thread(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    created_at = db.Column(db.Date, default=func.now())
+    content = db.Column(db.String)
+    author = db.Column(db.Integer, db.ForeignKey("user.id"))
+    is_reply = db.Column(db.Boolean, default=False)
+    is_approved = db.Column(db.Boolean, default=False)
+    has_replies = bool
+    num_replies = int
+
+    comments = db.relationship(
+        "Thread",
+        secondary="thread_replies",
+        primaryjoin=(thread_replies.c.original_id == id),
+        secondaryjoin=(thread_replies.c.reply_id),
+        lazy="dynamic",
+    )
+
+    def add_reply(self, thread):
+        if not self.has_reply(thread):
+            self.comments.append(thread)
+
+    def has_reply(self, thread):
+        query = self.comments.filter(Thread.id == thread.id).first()
+        return query is not None
+
+    @property
+    def num_replies(self):
+        return len(self.comments.all())
+
+    @property
+    def has_replies(self) -> bool:
+        return len(self.replies.all()) > 0

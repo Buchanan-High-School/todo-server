@@ -2,6 +2,7 @@ import os
 from config import Config
 from dotenv import load_dotenv
 
+from todo_server.extensions import sio
 
 for env_file in ".env":
     env = os.path.join(os.getcwd(), env_file)
@@ -11,4 +12,6 @@ for env_file in ".env":
 
 from todo_server import create_app
 
-app = create_app(Config)
+if __name__ == "__main__":
+    app = create_app(Config)
+    sio.run(app)
