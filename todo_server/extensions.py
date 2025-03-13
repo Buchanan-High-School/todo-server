@@ -9,7 +9,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 ma = Marshmallow()
 migrate = Migrate()
-sio = SocketIO()
+sio = SocketIO(async_mode="eventlet")
 
 
 convention = {
