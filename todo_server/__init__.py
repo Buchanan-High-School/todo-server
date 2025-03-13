@@ -14,7 +14,7 @@ from todo_server.exceptions import (
     unsupported_media_type,
 )
 from todo_server.extensions import db, login_manager, ma, migrate, sio
-from todo_server.blueprints import chat, todo
+from todo_server.blueprints import chat, course_review, threads, todo
 
 from config import Config
 
@@ -70,6 +70,8 @@ def create_app(config=Config):
     # register the routes
     app.register_blueprint(todo.bp)
     app.register_blueprint(chat.bp)
+    app.register_blueprint(course_review.bp)
+    app.register_blueprint(threads.bp)
 
     @app.before_request
     def preflight():

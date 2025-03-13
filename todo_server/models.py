@@ -107,7 +107,7 @@ class Thread(db.Model):
         "Thread",
         secondary="thread_replies",
         primaryjoin=(thread_replies.c.original_id == id),
-        secondaryjoin=(thread_replies.c.reply_id),
+        secondaryjoin=(thread_replies.c.reply_id == id),
         lazy="dynamic",
     )
 
@@ -126,3 +126,12 @@ class Thread(db.Model):
     @property
     def has_replies(self) -> bool:
         return len(self.replies.all()) > 0
+
+
+class CourseRecord(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    user_id = db.Column(db.Integer)
+    course = db.Column(db.String)
+    topic = db.Column(db.String)
+    period = db.Column(db.String)
+    todo = db.Column(db.String)
