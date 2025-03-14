@@ -18,8 +18,6 @@ dependencies = [
     "flask-marshmallow>=1.3.0",
     "marshmallow-sqlalchemy>=1.4.0",
     "nh3>=0.2.20",
-    "flask-socketio>=5.5.1",
-    "eventlet>=0.39.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"

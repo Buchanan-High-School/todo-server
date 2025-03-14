@@ -2,8 +2,6 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-import socketio
-
 from flask import Flask, has_request_context, jsonify, request, render_template
 from todo_server.exceptions import (
     bad_request,
@@ -13,8 +11,8 @@ from todo_server.exceptions import (
     unprocessable_entity,
     unsupported_media_type,
 )
-from todo_server.extensions import db, login_manager, ma, migrate, sio
-from todo_server.blueprints import chat, course_review, threads, todo
+from todo_server.extensions import db, login_manager, ma, migrate
+from todo_server.blueprints import course_review, threads, todo
 
 from config import Config
 
@@ -57,7 +55,6 @@ def create_app(config=Config):
     ma.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
-    sio.init_app(app)
 
     # register error handlers
     app.register_error_handler(400, bad_request)
@@ -69,7 +66,6 @@ def create_app(config=Config):
 
     # register the routes
     app.register_blueprint(todo.bp)
-    app.register_blueprint(chat.bp)
     app.register_blueprint(course_review.bp)
     app.register_blueprint(threads.bp)
 

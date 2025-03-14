@@ -6,27 +6,20 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
+#   universal: false
 
 -e file:.
 alembic==1.14.1
     # via flask-migrate
-bidict==0.23.1
-    # via python-socketio
 blinker==1.9.0
     # via flask
 click==8.1.8
     # via flask
-colorama==0.4.6
-    # via click
-dnspython==2.7.0
-    # via eventlet
-eventlet==0.39.1
-    # via todo-server
 flask==3.1.0
     # via flask-login
     # via flask-marshmallow
     # via flask-migrate
-    # via flask-socketio
     # via flask-sqlalchemy
     # via todo-server
 flask-login==0.6.3
@@ -35,18 +28,13 @@ flask-marshmallow==1.3.0
     # via todo-server
 flask-migrate==4.1.0
     # via todo-server
-flask-socketio==5.5.1
-    # via todo-server
 flask-sqlalchemy==3.1.1
     # via flask-migrate
     # via todo-server
 greenlet==3.1.1
-    # via eventlet
     # via sqlalchemy
 gunicorn==23.0.0
     # via todo-server
-h11==0.14.0
-    # via wsproto
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.5
@@ -73,12 +61,6 @@ psycopg2-binary==2.9.10
     # via todo-server
 python-dotenv==1.0.1
     # via todo-server
-python-engineio==4.11.2
-    # via python-socketio
-python-socketio==5.12.1
-    # via flask-socketio
-simple-websocket==1.1.0
-    # via python-engineio
 sqlalchemy==2.0.37
     # via alembic
     # via flask-sqlalchemy
@@ -92,5 +74,3 @@ webargs==8.6.0
 werkzeug==3.1.3
     # via flask
     # via flask-login
-wsproto==1.2.0
-    # via simple-websocket
