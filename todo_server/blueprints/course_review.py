@@ -22,7 +22,7 @@ def check_query_param():
 @bp.get("/course-todo")
 def get_all_course_todo():
     current_user = g.current_user
-    user_todo = Todo.query.filter(CourseRecord.user_id == current_user).all()
+    user_todo = CourseRecord.query.filter(CourseRecord.user_id == current_user).all()
     return (
         jsonify(
             {"data": CourseRecordSchema(many=True).dump(user_todo), "status": "success"}
@@ -58,14 +58,14 @@ def create_course_todo():
         args["description"] = clean_escaped_html(args.get("description"))
 
     course_todo = CourseRecord(user_id=g.current_user, **args)
-    db.session.add(todo)
+    db.session.add(course_todo)
     db.session.commit()
 
     todos = CourseRecord.query.filter(Todo.user_id == g.current_user).all()
     return (
         jsonify(
             {
-                "created": CourseRecordSchema().dump(todo),
+                "created": CourseRecordSchema().dump(course_todo),
                 "data": CourseRecordSchema(many=True).dump(todos),
                 "status": "success",
             }
