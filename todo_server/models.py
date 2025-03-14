@@ -127,10 +127,18 @@ class Thread(db.Model):
     def has_replies(self) -> bool:
         return len(self.replies.all()) > 0
 
-
 class CourseRecord(db.Model):
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.Integer)
+    course = db.Column(db.String)
+    topic = db.Column(db.String)
+    period = db.Column(db.String)
+    todo = db.Column(db.String)
+
+
+class CourseTodo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String)
     course = db.Column(db.String)
     topic = db.Column(db.String)
     period = db.Column(db.String)

@@ -3,7 +3,7 @@ from webargs import fields
 from webargs.flaskparser import parser
 
 from todo_server.extensions import db
-from todo_server.models import CourseRecord
+from todo_server.models import CourseTodo
 from todo_server.schemas import CourseRecordSchema
 from todo_server.utils import clean_escaped_html
 
@@ -22,7 +22,7 @@ def check_query_param():
 @bp.get("/course-todo")
 def get_all_course_todo():
     current_user = g.current_user
-    user_todo = CourseRecord.query.filter(CourseRecord.user_id == current_user).all()
+    user_todo = CourseTodo.query.filter(CourseTodo.user_id == current_user).all()
     return (
         jsonify(
             {"data": CourseRecordSchema(many=True).dump(user_todo), "status": "success"}
@@ -33,7 +33,7 @@ def get_all_course_todo():
 
 @bp.get("/course-todo/<int:todo_id>")
 def get_single_course_todo(todo_id):
-    todo = CourseRecord.query.filter(CourseRecord.id == todo_id).first()
+    todo = CourseTodo.query.filter(CourseTodo.id == todo_id).first()
 
     if not todo:
         abort(404)
@@ -57,11 +57,11 @@ def create_course_todo():
     if args.get("description"):
         args["description"] = clean_escaped_html(args.get("description"))
 
-    course_todo = CourseRecord(user_id=g.current_user, **args)
+    course_todo = CourseTodo(user_id=g.current_user, **args)
     db.session.add(course_todo)
     db.session.commit()
 
-    todos = CourseRecord.query.filter(Todo.user_id == g.current_user).all()
+    todos = CourseTodo.query.filter(CourseTodo.user_id == g.current_user).all()
     return (
         jsonify(
             {
