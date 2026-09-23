@@ -12,7 +12,6 @@ class TodoSchema(ma.Schema):
 
 class CourseRecordSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
-    user_id = ma.Integer()
     course = ma.String()
     topic = ma.String()
     period = ma.String()
