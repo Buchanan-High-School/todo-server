@@ -6,11 +6,19 @@ This sever has two components: a JSON server for working with APIs and a publish
 
 This is meant to be hosted locally without global access. As such, authentication is minimal and data should not be considered secure. Do not deploy without modifications if you are collecting sensitive or personally identifying information from users.
 
+## JSON server
+
+Expose endpoints to work with a todo-style application with persistent storage. See below for details on authentication and endpoints.
+
+## Static site deployment
+
+Allow logged-in users to upload zip-packaged static sites for automatic deployment. Projects are unzipped into a `~user/` directory and will receive a URL to their finished site. User sites are stored in the database for admin purposes only.
+
 ## Installation
 
 You will need:
 
-- SQL database (MySQL or postgres)
+- MySQL or Mariadb
 - nginx
 - Python
 
