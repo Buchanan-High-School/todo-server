@@ -45,8 +45,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(32), nullable=False)
     first_name = db.Column(db.String(32), nullable=False)
     email = db.Column(db.String(32), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    devices = db.relationship("Device", back_populates="user")
+    password_hash = db.Column(db.String(256))
     api_id = db.Column(db.String(32))
 
     projects = db.relationship(
