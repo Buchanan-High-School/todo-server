@@ -1,19 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>todo-server</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='pico.min.css') }}" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
-	<style>
-	</style>
-</head>
-
-<body>
-	<main>
-	<aside class="sidebar">
+{% extends 'layout.html' %}
+{% block sidebar %}
+<aside class="sidebar">
 		<ul>
 			<li><a href="#todo-server">todo-server</a></li>
 			<ul>
@@ -32,10 +19,12 @@
 			</ul>
 			<li>Other</li>
 			<ul>
-			<li><a href="{{ url_for('deploy.login') }}">Deploy a project</a></li>
+			<li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
 			</ul>
 		</ul>
 	</aside>
+	{% endblock %}
+	{% block main_content %}
 	<section class="not-sidebar">
 		<h1 id="todo-server">todo-server</h1>
 		<p>This is a small todo server to learn how to write JS applications against an API.</p>
@@ -235,7 +224,4 @@ fetch("http://todo-server.local/todo/1", options)
 </pre>
 			</section>
 		</section>
-	</main>
-</body>
-
-</html>
+{% endblock %}
