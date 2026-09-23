@@ -12,7 +12,7 @@ from todo_server.exceptions import (
     unsupported_media_type,
 )
 from todo_server.extensions import db, login_manager, ma, migrate
-from todo_server.blueprints import deploy, todo
+from todo_server.blueprints import auth, deploy, todo
 
 from config import Config
 
@@ -65,6 +65,7 @@ def create_app(config=Config):
     app.register_error_handler(500, server_error)
 
     # register the routes
+    app.register_blueprint(auth.bp)
     app.register_blueprint(todo.bp)
     app.register_blueprint(deploy.bp)
 
