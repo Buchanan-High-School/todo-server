@@ -1,4 +1,21 @@
-{% extends 'layout.html' %}
-{% block main_content %}
-<p>Upload a thing here.</p>
+{% extends 'layout.html' %} {% block sidebar %}
+<aside class="sidebar">
+  <h1>bucks.local</h1>
+</aside>
+{% endblock %} {% block main_content %}
+<div class="not-sidebar">
+  <h2>Project Deploy</h2>
+  <p>
+    Upload your zipped project files to finish your submission. Copy and paste
+    the URL you receive and submit it to Google Classroom.
+  </p>
+  <form method="post" action="" enctype="multipart/form-data">
+    <label
+      >Assignment name:
+      <input type="text" name="name" placeholder="Project name" required />
+    </label>
+    <input type="file" name="file" />
+    <input type="submit" value="Submit" />
+  </form>
+</div>
 {% endblock %}
