@@ -1,8 +1,8 @@
-# todo-server
+# bucks-server
 
-A simple Flask JSON server which writes to a SQL database from a frontend. 
+A simple Flask server to handle intro web dev coursework. 
 
-The purpose of this project is to allow first-year web development students to practice building frontend systems for pre-existing services which expose JSON APIs.
+This sever has two components: a JSON server for working with APIs and a publishing platform to automate static site deployment.
 
 This is meant to be hosted locally without global access. As such, authentication is minimal and data should not be considered secure. Do not deploy without modifications if you are collecting sensitive or personally identifying information from users.
 
@@ -10,7 +10,7 @@ This is meant to be hosted locally without global access. As such, authenticatio
 
 You will need:
 
-- postgres
+- SQL database (MySQL or postgres)
 - nginx
 - Python
 
