@@ -1,62 +1,77 @@
-{% extends 'layout.html' %}
-{% block sidebar %}
-<aside class="sidebar">
-		<ul>
-			<li><a href="#todo-server">todo-server</a></li>
-			<ul>
-				<li><a href="#calling">Calling the API</a></li>
-				<li><a href="#authentication">Authentication</a></li>
-				<li><a href="#headers">Request headers</a></li>
-				<li><a href="#responses">Responses</a></li>
-			</ul>
-		<li><a href="#endpoints">Endpoints</a></li>
-			<ul>
-				<li><a href="#get-todos">Get all todos</a></li>
-				<li><a href="#post-todo">Create a todo</a></li>
-				<li><a href="#get-todo">Get a single todo</a></li>
-				<li><a href="#put-todo">Update a single todo</a></li>
-				<li><a href="#delete-todo">Delete a todo</a></li>
-			</ul>
-			<li>Other</li>
-			<ul>
-			<li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
-			</ul>
-		</ul>
-	</aside>
-	{% endblock %}
-	{% block main_content %}
-	<section class="not-sidebar">
-		<h1 id="todo-server">todo-server</h1>
-		<p>This is a small todo server to learn how to write JS applications against an API.</p>
-		<p>This server allows you to create, read, update, and delete "todo" items. Using your school ID, you'll be able
-			to create your own website to interact with the API, giving you a tool to help you stay on top of things...to do.
-		</p>
-		<section>
-			<h2 id="calling">Calling the API</h2>
-			<h3 id="authentication">Authentication</h3>
-			<p>Each request needs an <code>Authorization</code> header. Your authorization right now is formatted with <code>lastname:school_id</code>. If the header is missing, the endpoint will return a <code>401 Unauthorized</code> error.
-			<pre>
+{% extends 'layout.html' %} {% block sidebar %}
+<ul>
+  <li><a href="#todo-server">todo-server</a></li>
+  <ul>
+    <li><a href="#calling">Calling the API</a></li>
+    <li><a href="#authentication">Authentication</a></li>
+    <li><a href="#headers">Request headers</a></li>
+    <li><a href="#responses">Responses</a></li>
+  </ul>
+  <li><a href="#endpoints">Endpoints</a></li>
+  <ul>
+    <li><a href="#get-todos">Get all todos</a></li>
+    <li><a href="#post-todo">Create a todo</a></li>
+    <li><a href="#get-todo">Get a single todo</a></li>
+    <li><a href="#put-todo">Update a single todo</a></li>
+    <li><a href="#delete-todo">Delete a todo</a></li>
+  </ul>
+  <li>Other</li>
+  <ul>
+    <li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
+  </ul>
+</ul>
+{% endblock %} {% block main_content %}
+<h1 id="todo-server">todo-server</h1>
+<p>
+  This is a small todo server to learn how to write JS applications against an
+  API.
+</p>
+<p>
+  This server allows you to create, read, update, and delete "todo" items. Using
+  your school ID, you'll be able to create your own website to interact with the
+  API, giving you a tool to help you stay on top of things...to do.
+</p>
+<section>
+  <h2 id="calling">Calling the API</h2>
+  <h3 id="authentication">Authentication</h3>
+  <p>
+    Each request needs an <code>Authorization</code> header. Your authorization
+    right now is formatted with <code>lastname:school_id</code>. If the header
+    is missing, the endpoint will return a <code>401 Unauthorized</code> error.
+  </p>
+  <pre>
 let options = {
 	headers: {
 		"Authorization": "Basic bbennett:000000"
 	}
 }
-</pre>
-			<h3>Other Request Headers</h3>
-			<p><code>todo-server</code> expects JSON and will return JSON. Set a header to ensure the proper format is
-				returned.
-				<pre>
+</pre
+  >
+  <h3>Other Request Headers</h3>
+  <p>
+    <code>todo-server</code> expects JSON and will return JSON. Set a header to
+    ensure the proper format is returned.
+  </p>
+  <pre>
 let options = {
 	headers: {
 		// authorization header
 		"Content-Type": "application/json"
 	}
 }
-</pre>
-			<h3 id="responses">Responses</h3>
-			<p>All respones are in JSON and have a <code>status</code> key you can use to check for errors.</b>
-			<p>Successful responses include the <code>data</code> key with the results of the operation. An error will have the <code>message</code> key with more information about the error.
-			<pre>
+</pre
+  >
+  <h3 id="responses">Responses</h3>
+  <p>
+    All respones are in JSON and have a <code>status</code> key you can use to
+    check for errors.
+  </p>
+  <p>
+    Successful responses include the <code>data</code> key with the results of
+    the operation. An error will have the <code>message</code> key with more
+    information about the error.
+  </p>
+  <pre>
 // Successful response
 {
 	"status": "success",
@@ -67,13 +82,17 @@ let options = {
 {
 	"status": "error",
 	"message": ...
-}</pre>
-			<h2 id="endpoints">Endpoints</h2>
-			<section class="endpoint">
-				<h3 id="get-todos">Get all todos</h3>
-				<p><code>GET http://todo-server.local/todo</code> List all todos for a user.</p>
-				<p>This will return an array of all todo items for the requested user.
-				<pre>
+}</pre
+  >
+</section>
+<h2 id="endpoints">Endpoints</h2>
+<section class="endpoint">
+  <h3 id="get-todos">Get all todos</h3>
+  <p>
+    <code>GET http://todo-server.local/todo</code> List all todos for a user.
+  </p>
+  <p>This will return an array of all todo items for the requested user.</p>
+  <pre>
 {
 	data: [
 		{
@@ -94,23 +113,36 @@ let options = {
 		},
 	],
 	status: "success"
-}			</pre>
-			</section>
-			<section class="endpoint">
-				<h3 id="post-todo">Create a todo</h3>
-				<p><code>POST http://todo-server.local/todo</code> create a todo item for a given user.</p>
-				<h4>Required parameters</h4>
-				<ul>
-					<li><code>&lt;string&gt; title</code>: heading for the item</li>
-				</ul>
-				<h4>Optional parameters</h4>
-				<ul>
-					<li><code>&lt;string&gt; description</code>: details about the todo item</li>
-					<li><code>&lt;Date&gt; due</code>: due date for the given item. If omitted, the due date will automatically be set to one day in the future from the time of creation.</li>
-					<li><code>&ltBoolean&gt; completed</code>: whether or not the item is completed.</li>
-				</ul>
-				<p>Send a request</p>
-				<pre>
+}			</pre
+  >
+</section>
+<section class="endpoint">
+  <h3 id="post-todo">Create a todo</h3>
+  <p>
+    <code>POST http://todo-server.local/todo</code> create a todo item for a
+    given user.
+  </p>
+  <h4>Required parameters</h4>
+  <ul>
+    <li><code>&lt;string&gt; title</code>: heading for the item</li>
+  </ul>
+  <h4>Optional parameters</h4>
+  <ul>
+    <li>
+      <code>&lt;string&gt; description</code>: details about the todo item
+    </li>
+    <li>
+      <code>&lt;Date&gt; due</code>: due date for the given item. If omitted,
+      the due date will automatically be set to one day in the future from the
+      time of creation.
+    </li>
+    <li>
+      <code>&lt;Boolean&gt; completed</code>: whether or not the item is
+      completed.
+    </li>
+  </ul>
+  <p>Send a request</p>
+  <pre>
 let options = {
 	headers: {
 		"Authorization": "Basic bbennett:0000",
@@ -126,9 +158,10 @@ let options = {
 }
 
 fetch("http://todo-server.local/todo", options)
-</pre>
-<p>Returns</p>
-<pre>
+</pre
+  >
+  <p>Returns</p>
+  <pre>
 {
 	"created": {
 		"id": 3,
@@ -144,12 +177,15 @@ fetch("http://todo-server.local/todo", options)
 	],
 	"status": "success" 
 }
-</pre>
-			</section>
-			<section class="endpoint">
-			<h3 id="get-todo">Get a single todo</h3>
-				<p><code>GET http://todo-server.local/todo/1</code> Get single todo for a user.</p>
-				<pre>
+</pre
+  >
+</section>
+<section class="endpoint">
+  <h3 id="get-todo">Get a single todo</h3>
+  <p>
+    <code>GET http://todo-server.local/todo/1</code> Get single todo for a user.
+  </p>
+  <pre>
 {
 	data: {
 		"id": 1,
@@ -161,20 +197,35 @@ fetch("http://todo-server.local/todo", options)
 	},
 	status: "success"
 }
-				</pre>
-			</section>
-			<section class="endpoint">
-				<h3 id="put-todo">Update a todo</h3>
-				<p><code>PUT http://todo-server.local/todo/1</code> update a single todo item</p>
-				<p>Valid fields sent in the request will be updated on the todo object. Empty requests will return a <code>400 Bad Request</code> error.</p>
-				<h4>Optional parameters</h4>
-				<ul>
-					<li><code>&lt;string&gt; title</code>: heading for the item</li>
-					<li><code>&lt;string&gt; description</code>: details about the todo item</li>
-					<li><code>&lt;Date&gt; due</code>: due date for the given item. If omitted, the due date will automatically be set to one day in the future from the time of creation.</li>
-					<li><code>&ltBoolean&gt; completed</code>: whether or not the item is completed.</li>
-				</ul>
-			<pre>
+				</pre
+  >
+</section>
+<section class="endpoint">
+  <h3 id="put-todo">Update a todo</h3>
+  <p>
+    <code>PUT http://todo-server.local/todo/1</code> update a single todo item
+  </p>
+  <p>
+    Valid fields sent in the request will be updated on the todo object. Empty
+    requests will return a <code>400 Bad Request</code> error.
+  </p>
+  <h4>Optional parameters</h4>
+  <ul>
+    <li><code>&lt;string&gt; title</code>: heading for the item</li>
+    <li>
+      <code>&lt;string&gt; description</code>: details about the todo item
+    </li>
+    <li>
+      <code>&lt;Date&gt; due</code>: due date for the given item. If omitted,
+      the due date will automatically be set to one day in the future from the
+      time of creation.
+    </li>
+    <li>
+      <code>&lt;Boolean&gt; completed</code>: whether or not the item is
+      completed.
+    </li>
+  </ul>
+  <pre>
 
 let options = {
 	headers: { // request headers },
@@ -201,11 +252,15 @@ fetch("http://todo-server.local/todo/1", options)
 	],
 	status: "success"
 }
-			</section>	
-			<section class="endpoint">
-				<h3 id="delete-todo">Delete a todo</h3>
-				<p><code>DELETE http://todo-server.local/todo/1</code> delete a todo for a user</p>
-				<pre>
+</pre
+  >
+</section>
+<section class="endpoint">
+  <h3 id="delete-todo">Delete a todo</h3>
+  <p>
+    <code>DELETE http://todo-server.local/todo/1</code> delete a todo for a user
+  </p>
+  <pre>
 let options = {
 	headers: { // request headers },
 	method: "DELETE"
@@ -221,7 +276,7 @@ fetch("http://todo-server.local/todo/1", options)
 	],
 	status: "success"
 }
-</pre>
-			</section>
-		</section>
+</pre
+  >
+</section>
 {% endblock %}
