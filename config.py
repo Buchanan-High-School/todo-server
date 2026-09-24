@@ -14,3 +14,7 @@ class Config(object):
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
     LOGIN_TOKEN = os.environ.get("LOGIN_TOKEN")
+
+    UPLOAD_PATH = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "todo_server", "user")
+    )
