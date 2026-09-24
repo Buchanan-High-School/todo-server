@@ -1,7 +1,5 @@
 {% extends 'layout.html' %} {% block sidebar %}
-<aside class="sidebar">
-  <h1>bucks.local</h1>
-</aside>
+  <h1><a href="{{url_for('index')}}">bucks.local</a></h1>
 {% endblock %} {% block main_content %}
 <div class="not-sidebar">
   <h2>Project Deploy</h2>
