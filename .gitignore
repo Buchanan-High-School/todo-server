@@ -18,3 +18,7 @@ gunicorn.config.py
 
 # app logs
 log/
+
+# user uploads
+user/
+user/*
