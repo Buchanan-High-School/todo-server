@@ -116,6 +116,11 @@ def handle_upload():
         return redirect(url_for("deploy.upload"))
 
 
+@bp.get("/user/<string:last_name>/<string:project_name>/<string:file_name>")
+def get_project_assets(last_name, project_name, file_name):
+    return send_from_directory("user/{}/{}".format(last_name, project_name), file_name)
+
+
 @bp.get("/user/<string:last_name>/<string:project_name>")
 def open_single_project(last_name, project_name):
     return send_from_directory(
