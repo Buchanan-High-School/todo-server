@@ -1,5 +1,5 @@
 import os
-import zipfile
+from zipfile import ZipFile
 
 from flask import (
     abort,
@@ -83,14 +83,9 @@ def handle_upload():
             )
             return render_template("upload.html"), 409
 
-        # make the new directory for the project based on the filename
-        os.mkdir(project_path)
+        with ZipFile(file) as zfile:
+            zfile.extractall(user_dir)
 
-        # save the zipfile and then extract immediately.
-        file.save(os.path.join(project_path, filename))
-        zip_ref = zipfile.ZipFile(os.path.join(project_path, filename), "r")
-        zip_ref.extractall(project_path)
-        zip_ref.close()
         # Get the published URL for the file
         live_url = url_for(
             "deploy.open_single_project",
@@ -116,8 +111,16 @@ def handle_upload():
         return redirect(url_for("deploy.upload"))
 
 
+@bp.get(
+    "/user/<string:last_name>/<string:project_name>/<string:subdir>/<string:file_name>"
+)
 @bp.get("/user/<string:last_name>/<string:project_name>/<string:file_name>")
-def get_project_assets(last_name, project_name, file_name):
+def get_project_assets(last_name, project_name, subdir=None, file_name=None):
+    print("Received {}, {}, {}, {}".format(last_name, project_name, file_name, subdir))
+    if subdir is not None:
+        return send_from_directory(
+            "user/{}/{}/{}".format(last_name, project_name, subdir), file_name
+        )
     return send_from_directory("user/{}/{}".format(last_name, project_name), file_name)
 
 
