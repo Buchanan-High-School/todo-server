@@ -83,7 +83,10 @@ def handle_upload():
             )
             return render_template("upload.html"), 409
 
-        with ZipFile(file) as zfile:
+        # copy the file with the project name
+        file_copy = os.rename(file.filename, request.form["name"])
+
+        with ZipFile(file_copy) as zfile:
             zfile.extractall(user_dir)
 
         # Get the published URL for the file
