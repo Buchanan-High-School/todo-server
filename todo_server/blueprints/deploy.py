@@ -1,6 +1,5 @@
 import os
-from zipfile import ZipFile
-
+import zipfile
 from flask import (
     abort,
     Blueprint,
@@ -43,6 +42,14 @@ def get_user_dir(user):
     return dir
 
 
+def is_safe_path(base_dir, path, follow_symlinks=True):
+    if follow_symlinks:
+        matchpath = os.path.realpath(path)
+    else:
+        matchpath = os.path.abspath(path)
+    return os.path.commonpath([base_dir, matchpath]) == base_dir
+
+
 # Get the upload form
 @bp.get("/upload")
 def upload():
@@ -71,11 +78,12 @@ def handle_upload():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename).split(".")[0]
+        project_name = secure_filename(request.form["name"])
 
         # Check that the user's directory exists.
         user_dir = get_user_dir(current_user)
 
-        project_path = os.path.join(user_dir, request.form["name"])
+        project_path = os.path.join(user_dir, project_name)
 
         if os.path.isdir(project_path):
             flash(
@@ -83,8 +91,22 @@ def handle_upload():
             )
             return render_template("upload.html"), 409
 
-        with ZipFile(file) as zfile:
-            zfile.extractall(user_dir)
+        zip_filename = "{}.zip".format(project_name)
+        zip_path = os.path.join(user_dir, zip_filename)
+        file.save(zip_path)
+
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                for member in zip_ref.infolist():
+                    member_path = os.path.join(project_path, member.filename)
+
+                    if not is_safe_path(project_path, member_path):
+                        flash("There is an illegal file path in the zip")
+                        return render_template("upload.html"), 400
+                    zip_ref.extract(member, project_path)
+        except zipfile.BadZipFile:
+            flash("Invalid or corrupted .zip file.")
+            return render_template("upload.html"), 400
 
         # Get the published URL for the file
         live_url = url_for(
@@ -95,7 +117,7 @@ def handle_upload():
 
         # Finally, save it to the database against the current user
         project = Project(
-            name=request.form["name"],
+            name=filename,
             owner=current_user.id,
         )
 
