@@ -47,6 +47,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     api_id = db.Column(db.String(32))
+    usertype_id = db.Column(db.Integer, default=2)
 
     projects = db.relationship(
         "Project",

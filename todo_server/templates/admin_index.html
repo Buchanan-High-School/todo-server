@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block sidebar %}
+  <ul>
+	<li><a href="{{ url_for('index') }}">Home</a></li>
+    <li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
+  </ul>
+{% endblock %}
+{% block main_content %}
+<h1>Project Manager</h1>
+<table>
+<thead>
+<th>Created</th>
+<th>Project Name</th>
+<th>Owner</th>
+<th>URL</th>
+</thead>
+<tbody>
+{% for item in items %}
+<tr>
+<td>{{ item.created_on }}</td>
+<td>{{ item.name }}</td>
+<td>{{ item.user.last_name }}, {{ item.user.first_name }}</td>
+<td><a href="{{ item.live_url }}">{{ item.live_url }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
