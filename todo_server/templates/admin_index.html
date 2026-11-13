@@ -13,6 +13,7 @@
 <th>Project Name</th>
 <th>Owner</th>
 <th>URL</th>
+<th>Actions</th>
 </thead>
 <tbody>
 {% for item in items %}
@@ -21,8 +22,65 @@
 <td>{{ item.name }}</td>
 <td>{{ item.user.last_name }}, {{ item.user.first_name }}</td>
 <td><a href="{{ item.live_url }}">{{ item.live_url }}</td>
+<td>
+<button class="confirm-delete" data-user="{{ current_user.last_name.lower() }}" data-project="{{ item.name }}">Delete</button>
 </tr>
 {% endfor %}
 </tbody>
 </table>
+<dialog id="confirm-delete">
+<div>
+  <h2>Stop!</h2>
+  <p>Deleting a project removes the project reference and <em>all</em> source files. <strong>This cannot be undone.<strong></p>
+  <p>Do you want to continue?</p>
+  <button id="dialog-confirm" class="warn">Yes, delete everything</button>
+  <button id="dialog-close">Cancel</button>
+  <span id="result"></span>
+</div>
+</dialog>
+
+<script>
+  const dialogButtons = document.querySelectorAll(`button.confirm-delete`);
+  const dialog = document.querySelector(`#confirm-delete`);
+  const closeDialogButton = document.querySelector(`#dialog-close`)
+  const confirmDialogButton = document.querySelector(`#dialog-confirm`)
+  const resultArea = document.querySelector(`#result`);
+  let projectName;
+  let currentUser;
+  
+  dialogButtons.forEach(button => {
+    button.addEventListener("click", (e) => {
+      projectName = e.target.dataset.project;
+      currentUser = e.target.dataset.user
+      console.log(projectName)
+      dialog.showModal();
+    })
+  })
+
+  closeDialogButton.addEventListener('click', () => {
+    dialog.close()
+    resultArea.textContent = "";
+  })
+
+  confirmDialogButton.addEventListener('click', async () => {
+    try {
+      const resp = await fetch(`/delete/${currentUser}/${projectName}`, {
+        method: 'delete'
+      })
+
+      if(!resp.ok) {
+        let err = await resp.json();
+        throw new Error(err.error)
+      }
+
+      const result = await resp.json()
+      console.log(result);
+      window.location.reload();
+    }
+    catch(err) {
+      resultArea.textContent = err;
+      console.log(err);
+    }
+  })
+</script>
 {% endblock %}

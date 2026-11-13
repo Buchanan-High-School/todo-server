@@ -45,3 +45,8 @@ main {
 	gap: 1rem;
 	justify-content: flex-end;
 }
+
+#dialog-confirm {
+	background-color: var(--pico-del-color);
+	border-color: var(--pico-del-color);
+}

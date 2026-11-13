@@ -6,6 +6,7 @@ from flask import (
     Blueprint,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -173,7 +174,9 @@ def handle_upload():
             current_user.last_name.lower(), safe_project_name
         )
         # Finally, save it to the database against the current user
-        project = Project(name=safe_filename, owner=current_user.id, live_url=live_url)
+        project = Project(
+            name=safe_project_name, owner=current_user.id, live_url=live_url
+        )
 
         db.session.add(project)
         db.session.commit()
@@ -187,10 +190,8 @@ def handle_upload():
         return redirect(url_for("deploy.upload"))
 
 
-@bp.route(
-    "/serve/<string:last_name>/<string:name>/", defaults={"filename": "index.html"}
-)
-@bp.route("/serve/<string:last_name>/<string:name>/<path:filename>")
+@bp.get("/serve/<string:last_name>/<string:name>/", defaults={"filename": "index.html"})
+@bp.get("/serve/<string:last_name>/<string:name>/<path:filename>")
 def serve_extracted_files(last_name, name, filename):
     safe_user_id = secure_filename(last_name)
     safe_name = secure_filename(name)
@@ -205,7 +206,61 @@ def serve_extracted_files(last_name, name, filename):
     return send_from_directory(target_dir, filename)
 
 
-@bp.get("/projects")
-def get_projects():
-    # Get all deployed projects for quick management
-    pass
+@bp.delete("/delete/<string:last_name>/<string:project_name>")
+def delete_project(last_name, project_name):
+    """
+    Delete a project and all of the contents.
+    This all happens through an ajax call, so return JSON.
+    """
+    # Check that the calling user is ACTUALLY the owner
+    if current_user.last_name.lower() != last_name:
+        return jsonify({"error": "You cannot delete projects you do not own."}), 400
+
+    safe_user_name = secure_filename(last_name)
+    safe_project_name = secure_filename(project_name)
+
+    if not safe_user_name or not safe_project_name:
+        return jsonify({"error": "Invalid username or project name."}), 400
+
+    user_dir = os.path.join(current_app.config["UPLOAD_PATH"], safe_user_name)
+    target_dir = os.path.join(user_dir, safe_project_name)
+
+    # The targeted folder MUST be inside the user folder. If not, abort.
+    if not is_safe_path(user_dir, target_dir) or os.path.abspath(
+        target_dir
+    ) == os.path.abspath(user_dir):
+        return jsonify({"error": "Invalid project directory."}), 400
+
+    if not os.path.exists(target_dir):
+        return (
+            jsonify({"error": "Project directory does not exist under your account."}),
+            404,
+        )
+
+    try:
+        stmt = (
+            db.select(Project)
+            .where(Project.name == safe_project_name)
+            .where(Project.owner == current_user.id)
+        )
+        project = db.session.scalars(stmt).first()
+
+        # Look for the project in the database first. If there isn't a matching row, STOP.
+        if not project:
+            return (
+                jsonify(
+                    {
+                        "error": "There was an error. Check with your teacher before trying again."
+                    }
+                ),
+                500,
+            )
+
+        db.session.delete(project)
+        db.session.commit()
+        shutil.rmtree(target_dir)
+
+    except OSError as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"message": "Project deleted successfully."}), 200
