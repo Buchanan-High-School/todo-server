@@ -44,11 +44,12 @@ def login():
 
     user = User.query.filter(User.email == form["email"]).first()
     if user is None or not user.check_password(form["password"]):
-        abort(401)
+        flash("Username or password is incorrect.")
+        return render_template("login.html"), 401
 
     login_user(user)
 
-    return redirect(url_for("deploy.upload"))
+    return redirect(url_for("index"))
 
 
 @bp.get("/logout")
