@@ -40,3 +40,8 @@ main {
 .not-sidebar {
 	flex: 1 1 0;
 }
+
+.not-sidebar > header > nav {
+	gap: 1rem;
+	justify-content: flex-end;
+}
