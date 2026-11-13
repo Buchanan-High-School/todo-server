@@ -1,5 +1,8 @@
 {% extends 'layout.html' %} {% block sidebar %}
   <h1><a href="{{url_for('index')}}">bucks.local</a></h1>
+{% if current_user %}
+	<p>Logged in as {{current_user.first_name}} {{ current_user.last_name }}</p>
+{% endif %}
 {% endblock %} {% block main_content %}
 <div class="not-sidebar">
   <h2>Project Deploy</h2>
@@ -9,10 +12,12 @@
   </p>
   <form method="post" action="" enctype="multipart/form-data">
     <label
-      >Assignment name:
-      <input type="text" name="name" placeholder="Project name" />
+      >Assignment name (required):
+      <input type="text" name="name" placeholder="Project name" required />
     </label>
+    <label>Project .zip (required)
     <input type="file" name="file" />
+    </label>
     <input type="submit" value="Submit" />
   </form>
 </div>

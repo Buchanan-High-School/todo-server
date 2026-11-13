@@ -67,4 +67,5 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), nullable=False)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"))
+    live_url = db.Column(db.String(256))
     created_on = db.Column(db.Date, default=func.now())
