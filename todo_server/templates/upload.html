@@ -1,8 +1,8 @@
 {% extends 'layout.html' %} {% block sidebar %}
-  <h1><a href="{{url_for('index')}}">bucks.local</a></h1>
-{% if current_user %}
-	<p>Logged in as {{current_user.first_name}} {{ current_user.last_name }}</p>
-{% endif %}
+  <ul>
+    <li><a href="{{url_for('index')}}">Home</a></li>
+    <li><a href="{{ url_for('admin.admin_index') }}">Manage Projects</a></li>
+  </ul>
 {% endblock %} {% block main_content %}
 <div class="not-sidebar">
   <h2>Project Deploy</h2>

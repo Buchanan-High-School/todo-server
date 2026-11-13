@@ -1,13 +1,18 @@
 {% extends 'layout.html' %} {% block sidebar %}
 <ul>
-  <li><a href="#todo-server">todo-server</a></li>
+  <li><a href="{{ url_for('index') }}">Home</a></li>
+  {% if not current_user.is_anonymous %}
+  <li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
+  <li><a href="{{ url_for('admin.admin_index') }}">Manage Projects</a></li>
+  {% endif %}
+  <li>todo-server</li>
   <ul>
     <li><a href="#calling">Calling the API</a></li>
     <li><a href="#authentication">Authentication</a></li>
     <li><a href="#headers">Request headers</a></li>
     <li><a href="#responses">Responses</a></li>
   </ul>
-  <li><a href="#endpoints">Endpoints</a></li>
+  <li>Endpoints</li>
   <ul>
     <li><a href="#get-todos">Get all todos</a></li>
     <li><a href="#post-todo">Create a todo</a></li>
@@ -15,22 +20,8 @@
     <li><a href="#put-todo">Update a single todo</a></li>
     <li><a href="#delete-todo">Delete a todo</a></li>
   </ul>
-  <li>Other</li>
-  <ul>
-    <li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
-  </ul>
 </ul>
 {% endblock %} {% block main_content %}
-<header>
-	<nav>
-		{% if current_user.is_anonymous %}
-		<a href="{{ url_for('auth.login') }}">Login</a>
-		{% else %}
-		<p>Logged in as {{ current_user.first_name }} {{ current_user.last_name }}</p>
-		<a href="{{ url_for('auth.logout') }}">Logout</a>
-		{% endif %}
-	</nav>
-</header>
 <h1 id="todo-server">todo-server</h1>
 <p>
   This is a small todo server to learn how to write JS applications against an
