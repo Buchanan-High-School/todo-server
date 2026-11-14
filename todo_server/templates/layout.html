@@ -25,7 +25,20 @@
           <li>{{ message }}</li>
           {% endfor %}
         </ul>
-        {% endif %} {% endwith %} {% block main_content %} {% endblock %}
+        {% endif %}
+        {% endwith %}
+
+        <header>
+        	<nav>
+        		{% if current_user.is_anonymous %}
+        		<a href="{{ url_for('auth.login') }}">Login</a>
+        		{% else %}
+        		<p>Logged in as {{ current_user.first_name }} {{ current_user.last_name }}</p>
+        		<a href="{{ url_for('auth.logout') }}">Logout</a>
+        		{% endif %}
+        	</nav>
+        </header>
+        {% block main_content %} {% endblock %}
       </div>
     </main>
   </body>

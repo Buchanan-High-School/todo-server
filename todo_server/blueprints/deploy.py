@@ -1,10 +1,12 @@
 import os
+import shutil
 import zipfile
 from flask import (
     abort,
     Blueprint,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -50,6 +52,28 @@ def is_safe_path(base_dir, path, follow_symlinks=True):
     return os.path.commonpath([base_dir, matchpath]) == base_dir
 
 
+def get_common_root(zip_ref):
+    """
+    Extract a file and remove the common root from the zipped file. This is to prevent a second-level folder from being created inside the project directory the user specifies.
+    """
+    # Start by making a set of all the first prefixes
+    top_levels = set()
+    for info in zip_ref.infolist():
+        # Remove any Mac metadata folders. Shame on you.
+        if info.filename.startswith("__MACOSX") or info.filename.endswith(".DS_STORE"):
+            continue
+        parts = info.filename.split("/")
+        if parts[0]:
+            top_levels.add(parts[0])
+
+    # only strip if there is one root directory with items. This preserves other nested directory paths
+    if len(top_levels) == 1:
+        root = top_levels.pop()
+        if any(info.filename.startswith(f"{root}/") for info in zip_ref.infolist()):
+            return f"{root}/"
+        return ""
+
+
 # Get the upload form
 @bp.get("/upload")
 def upload():
@@ -69,21 +93,30 @@ def handle_upload():
 
     if "file" not in request.files:
         flash("No file sent")
-        return redirect(request.url)
+        return redirect(request.url), 400
 
     file = request.files["file"]
     if file.filename == "":
         flash("No file selected")
-        return redirect(request.url)
+        return redirect(request.url), 400
+
+    if not request.form.get("name"):
+        flash("No project name given. Please enter a name for your published project.")
+        return redirect(request.url), 400
+
+    if not (file and allowed_file(file.filename)):
+        flash("Only .zip files are allowed.")
+        return redirect(request.url), 400
 
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename).split(".")[0]
-        project_name = secure_filename(request.form["name"])
+        safe_filename = secure_filename(file.filename).split(".")[0]
+        safe_project_name = secure_filename(request.form.get("name")).lower()
 
         # Check that the user's directory exists.
         user_dir = get_user_dir(current_user)
 
-        project_path = os.path.join(user_dir, project_name)
+        # Set a variable for the project path to use when saving the extracted zip.
+        project_path = os.path.join(user_dir, safe_project_name)
 
         if os.path.isdir(project_path):
             flash(
@@ -91,34 +124,58 @@ def handle_upload():
             )
             return render_template("upload.html"), 409
 
-        zip_filename = "{}.zip".format(project_name)
-        zip_path = os.path.join(user_dir, zip_filename)
-        file.save(zip_path)
+        # zip_filename = "{}.zip".format(safe_project_name)
+        # zip_path = os.path.join(user_dir, zip_filename)
+        # # file.save(zip_path)
 
+        # Extract and flatten
         try:
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                for member in zip_ref.infolist():
-                    member_path = os.path.join(project_path, member.filename)
+            with zipfile.ZipFile(file.stream, "r") as zip_ref:
+                root_prefix = get_common_root(zip_ref)
+                print(root_prefix)
 
-                    if not is_safe_path(project_path, member_path):
+                for member in zip_ref.infolist():
+                    if member.filename.startswith(
+                        "__MACOSX"
+                    ) or member.filename.endswith(".DS_STORE"):
+                        continue
+
+                    # Strip any top level folders from the path
+                    rel_path = member.filename
+                    print(member.filename)
+                    if root_prefix and rel_path.startswith(root_prefix):
+                        rel_path = rel_path[len(root_prefix) :]
+
+                    if not rel_path:
+                        continue
+
+                    destination_path = os.path.join(project_path, rel_path)
+
+                    if not is_safe_path(project_path, destination_path):
                         flash("There is an illegal file path in the zip")
                         return render_template("upload.html"), 400
-                    zip_ref.extract(member, project_path)
+
+                    # Make subdirectories or unzip files
+                    if member.is_dir():
+                        os.makedirs(destination_path, exist_ok=True)
+                    else:
+                        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+                        with (
+                            zip_ref.open(member) as source,
+                            open(destination_path, "wb") as target,
+                        ):
+                            shutil.copyfileobj(source, target)
         except zipfile.BadZipFile:
             flash("Invalid or corrupted .zip file.")
             return render_template("upload.html"), 400
 
         # Get the published URL for the file
-        live_url = url_for(
-            "deploy.open_single_project",
-            last_name=current_user.last_name.lower(),
-            project_name=request.form["name"],
+        live_url = "/serve/{}/{}".format(
+            current_user.last_name.lower(), safe_project_name
         )
-
         # Finally, save it to the database against the current user
         project = Project(
-            name=filename,
-            owner=current_user.id,
+            name=safe_project_name, owner=current_user.id, live_url=live_url
         )
 
         db.session.add(project)
@@ -133,27 +190,77 @@ def handle_upload():
         return redirect(url_for("deploy.upload"))
 
 
-@bp.get(
-    "/user/<string:last_name>/<string:project_name>/<string:subdir>/<string:file_name>"
-)
-@bp.get("/user/<string:last_name>/<string:project_name>/<string:file_name>")
-def get_project_assets(last_name, project_name, subdir=None, file_name=None):
-    print("Received {}, {}, {}, {}".format(last_name, project_name, file_name, subdir))
-    if subdir is not None:
-        return send_from_directory(
-            "user/{}/{}/{}".format(last_name, project_name, subdir), file_name
-        )
-    return send_from_directory("user/{}/{}".format(last_name, project_name), file_name)
+@bp.get("/serve/<string:last_name>/<string:name>/", defaults={"filename": "index.html"})
+@bp.get("/serve/<string:last_name>/<string:name>/<path:filename>")
+def serve_extracted_files(last_name, name, filename):
+    safe_user_id = secure_filename(last_name)
+    safe_name = secure_filename(name)
 
-
-@bp.get("/user/<string:last_name>/<string:project_name>")
-def open_single_project(last_name, project_name):
-    return send_from_directory(
-        "user/{}/{}".format(last_name, project_name), "index.html"
+    target_dir = os.path.join(
+        current_app.config["UPLOAD_PATH"], safe_user_id, safe_name
     )
 
+    if not os.path.exists(target_dir):
+        return render_template("404.html"), 404
 
-@bp.get("/projects")
-def get_projects():
-    # Get all deployed projects for quick management
-    pass
+    return send_from_directory(target_dir, filename)
+
+
+@bp.delete("/delete/<string:last_name>/<string:project_name>")
+def delete_project(last_name, project_name):
+    """
+    Delete a project and all of the contents.
+    This all happens through an ajax call, so return JSON.
+    """
+    # Check that the calling user is ACTUALLY the owner
+    if current_user.last_name.lower() != last_name:
+        return jsonify({"error": "You cannot delete projects you do not own."}), 400
+
+    safe_user_name = secure_filename(last_name)
+    safe_project_name = secure_filename(project_name)
+
+    if not safe_user_name or not safe_project_name:
+        return jsonify({"error": "Invalid username or project name."}), 400
+
+    user_dir = os.path.join(current_app.config["UPLOAD_PATH"], safe_user_name)
+    target_dir = os.path.join(user_dir, safe_project_name)
+
+    # The targeted folder MUST be inside the user folder. If not, abort.
+    if not is_safe_path(user_dir, target_dir) or os.path.abspath(
+        target_dir
+    ) == os.path.abspath(user_dir):
+        return jsonify({"error": "Invalid project directory."}), 400
+
+    if not os.path.exists(target_dir):
+        return (
+            jsonify({"error": "Project directory does not exist under your account."}),
+            404,
+        )
+
+    try:
+        stmt = (
+            db.select(Project)
+            .where(Project.name == safe_project_name)
+            .where(Project.owner == current_user.id)
+        )
+        project = db.session.scalars(stmt).first()
+
+        # Look for the project in the database first. If there isn't a matching row, STOP.
+        if not project:
+            return (
+                jsonify(
+                    {
+                        "error": "There was an error. Check with your teacher before trying again."
+                    }
+                ),
+                500,
+            )
+
+        db.session.delete(project)
+        db.session.commit()
+        shutil.rmtree(target_dir)
+
+    except OSError as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"message": "Project deleted successfully."}), 200

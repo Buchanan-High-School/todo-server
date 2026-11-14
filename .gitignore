@@ -6,6 +6,9 @@ dist/
 wheels/
 *.egg-info
 
+# MacOS junk
+.DS_Store
+
 # venv
 .venv
 

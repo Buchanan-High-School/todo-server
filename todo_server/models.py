@@ -47,6 +47,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     api_id = db.Column(db.String(32))
+    # Set 1 for superuser, 2 for regular user.
+    # Superuser accounts can see all projects published.
+    usertype_id = db.Column(db.Integer, default=2)
 
     projects = db.relationship(
         "Project",
@@ -67,4 +70,5 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), nullable=False)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"))
+    live_url = db.Column(db.String(256))
     created_on = db.Column(db.Date, default=func.now())

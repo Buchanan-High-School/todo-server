@@ -40,3 +40,13 @@ main {
 .not-sidebar {
 	flex: 1 1 0;
 }
+
+.not-sidebar > header > nav {
+	gap: 1rem;
+	justify-content: flex-end;
+}
+
+#dialog-confirm {
+	background-color: var(--pico-del-color);
+	border-color: var(--pico-del-color);
+}
