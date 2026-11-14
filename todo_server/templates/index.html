@@ -3,7 +3,9 @@
   <li><a href="{{ url_for('index') }}">Home</a></li>
   {% if not current_user.is_anonymous %}
   <li><a href="{{ url_for('deploy.upload') }}">Deploy a project</a></li>
-  <li><a href="{{ url_for('admin.admin_index') }}">Manage Projects</a></li>
+  <li><a href="{{ url_for('admin.project_index') }}">Manage Projects</a></li>
+  {% endif %} {% if current_user.usertype_id == 1 %}
+  <li><a href="{{ url_for('admin.user_index') }}">Manage Users</a></li>
   {% endif %}
   <li>todo-server</li>
   <ul>
@@ -24,12 +26,24 @@
 {% endblock %} {% block main_content %}
 <h1>bucks.local</h1>
 <p>
-  This is a teaching server for project deployment and for learning how to write JS applications against an API.
+  This is a teaching server for project deployment and for learning how to write
+  JS applications against an API.
 </p>
 <h2 id="static-site">Static site deployment</h2>
-<p><a href="{{ url_for('auth.register') }}">Register for an account</a> to enable static site deployment.</p>
-<p>Once registered, you can upload <code>.zip</code> archives of site resources. The package will be unpacked into a directory for your user and you'll receive a live URL you can share.</p>
-<p>A user admin panel will allow you to see all of your published projects. You can also delete any published projects from this page. Project deletion is permanent and you will need to re-upload resources to re-enable the site.</p>
+<p>
+  <a href="{{ url_for('auth.register') }}">Register for an account</a> to enable
+  static site deployment.
+</p>
+<p>
+  Once registered, you can upload <code>.zip</code> archives of site resources.
+  The package will be unpacked into a directory for your user and you'll receive
+  a live URL you can share.
+</p>
+<p>
+  A user admin panel will allow you to see all of your published projects. You
+  can also delete any published projects from this page. Project deletion is
+  permanent and you will need to re-upload resources to re-enable the site.
+</p>
 <h2 id="todo-server">todo-server</h2>
 <p>
   This server allows you to create, read, update, and delete "todo" items. Using

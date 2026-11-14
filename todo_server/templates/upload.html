@@ -1,8 +1,11 @@
 {% extends 'layout.html' %} {% block sidebar %}
-  <ul>
-    <li><a href="{{url_for('index')}}">Home</a></li>
-    <li><a href="{{ url_for('admin.admin_index') }}">Manage Projects</a></li>
-  </ul>
+<ul>
+  <li><a href="{{url_for('index')}}">Home</a></li>
+  <li><a href="{{ url_for('admin.project_index') }}">Manage Projects</a></li>
+  {% if current_user.usertype_id == 1 %}
+  <li><a href="{{ url_for('admin.user_index') }}">Manage Users</a></li>
+  {% endif %}
+</ul>
 {% endblock %} {% block main_content %}
 <div class="not-sidebar">
   <h2>Project Deploy</h2>
@@ -15,8 +18,9 @@
       >Assignment name (required):
       <input type="text" name="name" placeholder="Project name" required />
     </label>
-    <label>Project .zip (required)
-    <input type="file" name="file" />
+    <label
+      >Project .zip (required)
+      <input type="file" name="file" />
     </label>
     <input type="submit" value="Submit" />
   </form>
