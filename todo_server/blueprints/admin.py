@@ -7,7 +7,7 @@ from todo_server.models import Project, User
 bp = Blueprint("admin", __name__)
 
 
-@bp.get("/admin")
+@bp.get("/admin/projects")
 def admin_index():
     page = request.args.get("page", 1, type=int)
     if current_user.usertype_id == 2:
@@ -22,3 +22,15 @@ def admin_index():
     return render_template(
         "admin_index.html", items=pagination.items, pagination=pagination
     )
+
+
+@bp.get("/admin/users")
+def user_admin():
+    if current_user.usertype_id != 1:
+        flash("You are not authorized to view this page.")
+        return redirect(url_for("index")), 401
+
+    stmt = db.select(User).order_by(User.last_name)
+    users = db.session.scalars(stmt).all()
+
+    return render_template("admin_users.html", users=users)
