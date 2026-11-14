@@ -1,6 +1,6 @@
 # bucks-server
 
-A simple Flask server to handle intro web dev coursework. 
+A simple teaching server written in Flask to handle intro web dev coursework. 
 
 This sever has two components: a JSON server for working with APIs and a publishing platform to automate static site deployment.
 
@@ -12,13 +12,13 @@ Expose endpoints to work with a todo-style application with persistent storage. 
 
 ## Static site deployment
 
-Allow logged-in users to upload zip-packaged static sites for automatic deployment. Projects are unzipped into a `~user/` directory and will receive a URL to their finished site. User sites are stored in the database for admin purposes only.
+Allow logged-in users to upload zip-packaged static sites for automatic deployment. Projects are unzipped into a `/user/` directory and will receive a URL to their finished site. User sites are stored in the database for admin purposes only.
 
 ## Installation
 
 You will need:
 
-- MySQL or Mariadb
+- postgresql database
 - nginx
 - Python
 
@@ -32,6 +32,12 @@ You can also install with `rye` or `uv`
 `uv sync`
 
 Modify `.env` and `.config.py.sample` with your environment variables for database interactions.
+
+## Static site deployment
+
+Once users have registered, they can upload sites packaged into zip archives. User account directories are automatically created and each site is unpacked into a proejct folder using the name specified.
+
+Each user gets a simple admin interface which allows them to get live site URLs or to permanently delete site assets. Be aware that deleting a site is permanent and removes all of the project assets as well as the database record.
 
 ## API
 

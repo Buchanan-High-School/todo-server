@@ -22,18 +22,22 @@
   </ul>
 </ul>
 {% endblock %} {% block main_content %}
-<h1 id="todo-server">todo-server</h1>
+<h1>bucks.local</h1>
 <p>
-  This is a small todo server to learn how to write JS applications against an
-  API.
+  This is a teaching server for project deployment and for learning how to write JS applications against an API.
 </p>
+<h2 id="static-site">Static site deployment</h2>
+<p><a href="{{ url_for('auth.register') }}">Register for an account</a> to enable static site deployment.</p>
+<p>Once registered, you can upload <code>.zip</code> archives of site resources. The package will be unpacked into a directory for your user and you'll receive a live URL you can share.</p>
+<p>A user admin panel will allow you to see all of your published projects. You can also delete any published projects from this page. Project deletion is permanent and you will need to re-upload resources to re-enable the site.</p>
+<h2 id="todo-server">todo-server</h2>
 <p>
   This server allows you to create, read, update, and delete "todo" items. Using
   your school ID, you'll be able to create your own website to interact with the
   API, giving you a tool to help you stay on top of things...to do.
 </p>
 <section>
-  <h2 id="calling">Calling the API</h2>
+  <h2 id="calling">Using the API</h2>
   <h3 id="authentication">Authentication</h3>
   <p>
     Each request needs an <code>Authorization</code> header. Your authorization
@@ -43,7 +47,7 @@
   <pre>
 let options = {
 	headers: {
-		"Authorization": "Basic bbennett:000000"
+		"Authorization": "Basic lastname:000000"
 	}
 }
 </pre
