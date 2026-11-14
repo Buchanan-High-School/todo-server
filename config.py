@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
 load_dotenv(os.path.join(basedir, ".env"))
 
 
@@ -15,6 +14,7 @@ class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY")
     LOGIN_TOKEN = os.environ.get("LOGIN_TOKEN")
 
+    # Static site uploads will be saved in the directory set here. Default is a `user` directory in the application root.
     UPLOAD_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "todo_server", "user")
     )

@@ -31,7 +31,15 @@ You can also install with `rye` or `uv`
 `rye sync`
 `uv sync`
 
-Modify `.env` and `.config.py.sample` with your environment variables for database interactions.
+Create a database and user in postgres.
+
+Modify `.env` and `.config.py` with your environment variables for database interactions.
+
+Run `uv run flask db upgrade` to create the tables with the user credentials you created.
+
+Start the application server with `uv run flask run`.
+
+For production, use a proper WSGI server like [Gunicorn](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/).
 
 ## Static site deployment
 
