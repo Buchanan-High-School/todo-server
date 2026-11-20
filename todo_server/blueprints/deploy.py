@@ -182,8 +182,8 @@ def handle_upload():
         db.session.commit()
 
         message = Markup(
-            "View your project at <a href='{}' target='_blank'>{}</a>".format(
-                live_url, live_url
+            "View your project at <a href='{}' target='_blank'>{}{}</a>".format(
+                live_url, current_app.config["BASE_URL"], live_url
             )
         )
         flash(message)

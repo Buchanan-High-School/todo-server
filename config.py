@@ -18,3 +18,5 @@ class Config(object):
     UPLOAD_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "todo_server", "user")
     )
+
+    BASE_URL = os.environ.get("BASE_URL")

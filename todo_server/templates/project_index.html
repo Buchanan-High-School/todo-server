@@ -22,7 +22,7 @@
       <td>{{ item.created_on }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.user.last_name }}, {{ item.user.first_name }}</td>
-      <td><a href="{{item.live_url}}">{{ item.live_url }}</a></td>
+      <td><a href="{{item.live_url}}">{{ config["BASE_URL"] }}{{ item.live_url }}</a></td>
       <td>
         <button
           class="confirm-delete"
